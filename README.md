@@ -41,6 +41,83 @@ This is a scientific reduction of the panel rather than an artificial slowdown o
 9. Retains a detailed Fol4287-vs-Fo47 Circos plot rather than putting all genomes into one crowded circular plot.
 10. Writes `CHECKSUMS.txt` with SHA256 hashes for every downloaded/derived data file and every result file.
 
+
+## Data
+
+All genomic input data are public NCBI genome assemblies and are downloaded automatically by the pipeline. The repository therefore does not store large FASTA files in Git. Instead, the exact versioned assembly accessions are recorded in `config/genomes.tsv`, and `scripts/01_download_genomes.sh` retrieves them with NCBI Datasets every time the analysis is started from a clean clone.
+
+The pipeline creates two generated data directories:
+
+- `data/raw/` — contains the complete genomic FASTA downloaded for each of the five assemblies. These files are the original sequence inputs used by the workflow. The expected files are `Fol4287.fna`, `Fo47.fna`, `FoCL57.fna`, `FoCotton.fna`, and `FolD11.fna`.
+- `data/analysis/` — contains chromosome-only FASTA files generated for analyses that require chromosome-scale records. `Fol4287.chromosomes.fna` contains the 15 Fol4287 chromosome records used as the MUMmer reference. `Fo47.chromosomes.fna` contains the 12 Fo47 chromosome records used for the detailed Circos visualization.
+
+The other query genomes are compared to the Fol4287 chromosome-only reference using their complete downloaded assemblies in `data/raw/`. This preserves all query assembly sequence while keeping the Fol4287 reference restricted to its chromosome-scale `NC_` records.
+
+Genome metadata and sequence structure are parsed by `scripts/01_parse_genomes.py`. The script records the number of sequences, total assembly size, and counts of `NC_`, `NW_`, and other sequence records in `results/genome_metadata.tsv`. It also writes:
+
+- `results/reference_chromosome_metadata.tsv` — Fol4287 chromosome identifiers, chromosome numbers, lengths, chromosome class, and FASTA descriptions.
+- `results/Fo47_chromosome_metadata.tsv` — Fo47 chromosome identifiers, chromosome labels, lengths, and core/accessory classification.
+
+Fol4287 chromosome classes are not inferred during the run. They are explicitly defined in the tracked file `config/fol4287_chromosome_classes.tsv`, where chromosomes 3, 6, 14, and 15 are designated lineage-specific and the remaining whole chromosomes are designated core.
+
+Because `data/` is generated automatically, it is excluded from Git by `.gitignore`. The data are nevertheless included in `CHECKSUMS.txt`, so the exact FASTA files used in a successful run can be verified with SHA256 hashes.
+
+## Scripts
+
+The analysis is organized as numbered scripts so each computational stage can be inspected and, if necessary, run separately. `run_all.sh` executes them in order after creating the software environment.
+
+### `setup.sh`
+
+Bootstraps the software environment. It detects the operating system and CPU architecture, downloads the pinned Miniforge installer if necessary, verifies the Miniforge installer with its official SHA256 checksum, creates the Conda environment from `environment.yml`, activates the environment, and records the installed software versions in `software_versions.tsv`.
+
+### `scripts/common.sh`
+
+Provides shared setup used by all numbered shell scripts. It identifies the project root, sets deterministic locale/time-zone variables, loads the project-local Miniforge installation, activates the analysis environment, and defines a cross-platform SHA256 helper that works with either `sha256sum` or `shasum -a 256`.
+
+### `scripts/01_download_genomes.sh`
+
+Reads the exact genome accessions from `config/genomes.tsv`, downloads each assembly with NCBI Datasets, extracts the genomic FASTA, and saves it under a stable genome name in `data/raw/`. It then runs SeqKit to generate `results/genome_stats.tsv` and calls `scripts/01_parse_genomes.py` to prepare chromosome-scale files and metadata.
+
+### `scripts/01_parse_genomes.py`
+
+Parses FASTA records and NCBI FASTA descriptions. It summarizes assembly structure, selects the 15 chromosome records from Fol4287 and the 12 chromosome records from Fo47, writes chromosome-only FASTA files to `data/analysis/`, and creates the chromosome metadata tables used by later analyses and figures.
+
+### `scripts/02_run_mummer.sh`
+
+Runs the main external comparative-genomics analysis. Fol4287 chromosome sequences are used as the reference, and each of the four query genomes is analyzed sequentially with MUMmer4 `dnadiff`. The script saves the direct `dnadiff` reports in `results/reports/`, one-to-one coordinate tables in `results/pairwise_coords/`, and an index of pairwise outputs in `results/pairwise_outputs.tsv`. Raw/intermediate MUMmer files remain in `tmp/mummer/`.
+
+### `scripts/03_summarize_multigenome.sh`
+
+Shell wrapper for the multi-genome summary step. It loads the reproducible environment, checks that all expected MUMmer coordinate tables are present, records the run in `logs/`, and executes `scripts/03_summarize_multigenome.py`.
+
+### `scripts/03_summarize_multigenome.py`
+
+Converts the pairwise MUMmer coordinates into biological summaries. For every Fol4287 chromosome and every query genome, it calculates unique aligned Fol4287 bases, percentage aligned, alignment-block count, weighted nucleotide identity, largest alignment block, and alignment orientation. It then generates the multi-genome result tables used by the figures, including `multigenome_chromosome_synteny.tsv`, `percent_aligned_matrix.tsv`, `core_vs_lineage_specific_by_query.tsv`, and `chromosome_across_query_summary.tsv`. It also prepares the filtered Fo47 link table used by the Circos plot.
+
+### `scripts/04_plot_summary.sh`
+
+Shell wrapper for the main multi-genome figures. It activates the environment, writes a plotting log, and runs `scripts/04_plot_summary.R`.
+
+### `scripts/04_plot_summary.R`
+
+Produces the two main summary visualizations: `Fol4287_multigenome_heatmap.svg`, showing the percentage of each Fol4287 chromosome aligned to each query genome, and `core_vs_lineage_specific_by_query.svg`, comparing total conservation of core versus lineage-specific Fol4287 chromosomes across the four query assemblies.
+
+### `scripts/05_plot_circos.sh`
+
+Shell wrapper for the detailed Fol4287-versus-Fo47 chromosome-scale visualization. It exports the plotting thresholds from `config/parameters.sh`, records a log, and runs `scripts/05_plot_circos.R`.
+
+### `scripts/05_plot_circos.R`
+
+Creates `Fol4287_vs_Fo47_circos.svg`. The figure displays the 15 Fol4287 chromosomes and 12 Fo47 chromosomes, distinguishes Fol4287 core and lineage-specific chromosomes, marks Fo47 chromosome VII as accessory, and draws filtered one-to-one MUMmer links between the two assemblies. The Circos thresholds are visualization filters only and do not change the quantitative chromosome-conservation summaries.
+
+### `scripts/06_checksums.sh`
+
+Generates the final reproducibility manifest. It finds every file under `data/` and `results/`, computes a SHA256 hash for each file, writes the hashes to `CHECKSUMS.txt`, and immediately verifies the completed manifest.
+
+### `run_all.sh`
+
+Master workflow entry point. It runs `setup.sh`, removes previously generated `data/`, `tmp/`, and `results/` directories so the analysis starts cleanly, executes Steps 1–6 in order, verifies that all required final outputs exist, and reports the total wall-clock runtime. A reproducer should normally run this file rather than invoking individual scripts manually.
+
 ## Requirements
 
 ### Windows
@@ -54,7 +131,7 @@ A normal Bash shell, Git, internet access, and either `curl` or `wget` are suffi
 ## Run from a clean clone
 
 ```bash
-git clone YOUR_REPOSITORY_URL
+git clone https://github.com/ArpanPrj/CBC_2026_Week5.git
 cd fol4287_five_genome_synteny
 bash run_all.sh
 ```
