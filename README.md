@@ -132,7 +132,7 @@ A normal Bash shell, Git, internet access, and either `curl` or `wget` are suffi
 
 ```bash
 git clone https://github.com/ArpanPrj/CBC_2026_Week5.git
-cd fol4287_five_genome_synteny
+cd CBC_2026_Week5
 bash run_all.sh
 ```
 
