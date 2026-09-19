@@ -1,10 +1,10 @@
 chromosome	chromosome_class	mean_percent_aligned_across_queries	median_percent_aligned_across_queries	min_percent_aligned	max_percent_aligned
 1	core	86.0979	85.0698	79.9356	94.3166
 2	core	82.9024	81.7545	80.6712	87.4292
-3	lineage_specific	20.2178	14.1232	10.4435	42.1815
+3	lineage_specific	20.2200	14.1274	10.4435	42.1815
 4	core	93.9450	93.4952	90.8474	97.9420
 5	core	94.9921	94.1991	93.9853	97.5848
-6	lineage_specific	21.7618	12.5595	7.8665	54.0620
+6	lineage_specific	21.7609	12.5576	7.8665	54.0620
 7	core	95.8306	95.3855	93.9265	98.6249
 8	core	94.9417	94.5050	92.3686	98.3885
 9	core	94.3527	93.7626	90.9487	98.9368
@@ -12,5 +12,5 @@ chromosome	chromosome_class	mean_percent_aligned_across_queries	median_percent_a
 11	core	93.7565	93.7467	89.1822	98.3505
 12	core	91.8888	89.6600	89.0743	99.1607
 13	core	93.2166	92.8856	89.2946	97.8006
-14	lineage_specific	31.4286	19.5731	7.4350	79.1329
-15	lineage_specific	32.7238	24.7168	13.1673	68.2942
+14	lineage_specific	31.4248	19.5656	7.4350	79.1329
+15	lineage_specific	32.7260	24.7212	13.1673	68.2942
