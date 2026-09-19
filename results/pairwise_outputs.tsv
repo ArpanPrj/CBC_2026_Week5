@@ -1,0 +1,5 @@
+query	accession	host_context	report	coords
+Fo47	GCF_013085055.1	endophyte_biocontrol	results/reports/Fol4287_vs_Fo47.report	results/pairwise_coords/Fol4287_vs_Fo47.1coords.tsv
+FoCL57	GCA_000260155.3	tomato_crown_root_rot	results/reports/Fol4287_vs_FoCL57.report	results/pairwise_coords/Fol4287_vs_FoCL57.1coords.tsv
+FoCotton	GCA_000260175.2	cotton_wilt	results/reports/Fol4287_vs_FoCotton.report	results/pairwise_coords/Fol4287_vs_FoCotton.1coords.tsv
+FolD11	GCA_003977725.1	tomato_wilt	results/reports/Fol4287_vs_FolD11.report	results/pairwise_coords/Fol4287_vs_FolD11.1coords.tsv

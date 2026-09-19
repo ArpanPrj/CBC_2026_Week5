@@ -1,0 +1,7 @@
+metric	value
+all_one_to_one_blocks	3538
+plot_min_alignment_length_bp	50000
+plot_min_identity_percent	90
+blocks_retained_for_plot	199
+same_orientation_blocks_for_plot	59
+opposite_orientation_blocks_for_plot	140

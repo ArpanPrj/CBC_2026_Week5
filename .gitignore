@@ -1,0 +1,18 @@
+# Public input genomes are downloaded by the pipeline
+data/
+
+# MUMmer intermediates
+tmp/
+
+# Runtime logs
+logs/
+
+# Download archives
+*.zip
+
+# OS/editor files
+.DS_Store
+Thumbs.db
+*~
+*.swp
+.Rhistory

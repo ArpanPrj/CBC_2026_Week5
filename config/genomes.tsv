@@ -1,0 +1,6 @@
+name	accession	role	host_context	circos
+Fol4287	GCF_000149955.1	reference	tomato_wilt	yes
+Fo47	GCF_013085055.1	query	endophyte_biocontrol	yes
+FoCL57	GCA_000260155.3	query	tomato_crown_root_rot	no
+FoCotton	GCA_000260175.2	query	cotton_wilt	no
+FolD11	GCA_003977725.1	query	tomato_wilt	no

@@ -1,0 +1,6 @@
+name	accession	role	host_context	circos	num_sequences	total_bp	NC_records	NW_records	other_records
+Fol4287	GCF_000149955.1	reference	tomato_wilt	yes	85	61386934	15	70	0
+Fo47	GCF_013085055.1	query	endophyte_biocontrol	yes	12	50358849	12	0	0
+FoCL57	GCA_000260155.3	query	tomato_crown_root_rot	no	418	49359289	0	0	418
+FoCotton	GCA_000260175.2	query	cotton_wilt	no	985	52914414	0	0	985
+FolD11	GCA_003977725.1	query	tomato_wilt	no	39	57281978	0	0	39
